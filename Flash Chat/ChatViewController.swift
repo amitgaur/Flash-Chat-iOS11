@@ -7,12 +7,14 @@
 //
 
 import UIKit
-
+import FirebaseAuth
+import SVProgressHUD
 
 class ChatViewController: UIViewController {
     
     // Declare instance variables here
 
+    
     
     // We've pre-linked the IBOutlets
     @IBOutlet var heightConstraint: NSLayoutConstraint!
@@ -105,8 +107,21 @@ class ChatViewController: UIViewController {
     
     
     @IBAction func logOutPressed(_ sender: AnyObject) {
+        do {
+            try Auth.auth().signOut()
+            print ("Signed user out" )
+            guard (navigationController?.popToRootViewController(animated: true)) != nil
+                
+            else {
+                return
+            }
+            
+        }catch {
+            print ("Error signing out ")
+            SVProgressHUD.showError(withStatus: "We were unable to sign you out, please try again later")
+        }
         
-        //TODO: Log out the user and send them back to WelcomeViewController
+       
         
         
     }

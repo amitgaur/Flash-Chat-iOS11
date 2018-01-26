@@ -7,18 +7,32 @@
 //
 
 import UIKit
+import Firebase
 
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    
+    var ref  : DatabaseReference!
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
         //TODO: Initialise and Configure your Firebase here:
         
+        FirebaseApp.configure()
+        let userDefaults = UserDefaults.standard
+        if userDefaults.value(forKey : "appFirstTimeOpend") == nil {
+            //if app is first time opened then it will be nil
+            userDefaults.setValue(true, forKey: "appFirstTimeOpend")
+            // signOut from FIRAuth
+            do {
+                try Auth.auth().signOut()
+                print ("Signed user out"    )
+            }catch {
+                print ("Error signing out")
+            }
+        }
         
         return true
     }
