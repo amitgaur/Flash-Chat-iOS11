@@ -10,7 +10,21 @@ import UIKit
 import FirebaseAuth
 import SVProgressHUD
 
-class ChatViewController: UIViewController {
+class ChatViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
+    var messages : [String] = ["1","2asda asdasda a sdasdasd  asdaj;iasdjio asda'da'sid''sad asdasd asdasd'oasid'oasdi'asdioa'sdi 'said'aosdia'sid 'asoid as'id a'sid 'asid 'as'asid ","3"]
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 3;
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "customMessageCell", for: indexPath) as! CustomMessageCell
+        cell.messageBody.text = messages[indexPath.row]
+        return cell
+        
+    }
+    
+    
     
     // Declare instance variables here
 
@@ -27,8 +41,9 @@ class ChatViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //TODO: Set yourself as the delegate and datasource here:
-        
+        messageTableView.delegate = self;
+        messageTableView.dataSource = self
+        messageTextfield.delegate  = self
         
         
         //TODO: Set yourself as the delegate of the text field here:
@@ -40,31 +55,27 @@ class ChatViewController: UIViewController {
         
 
         //TODO: Register your MessageCell.xib file here:
-
+        messageTableView.register(UINib(nibName : "MessageCell", bundle : nil), forCellReuseIdentifier: "customMessageCell")
+        configureTableView()
         
     }
 
-    ///////////////////////////////////////////
-    
-    //MARK: - TableView DataSource Methods
-    
-    
-    
-    //TODO: Declare cellForRowAtIndexPath here:
-    
-    
-    
-    //TODO: Declare numberOfRowsInSection here:
-    
+  
     
     
     //TODO: Declare tableViewTapped here:
     
-    
+    @IBAction func tapped(recognizer : UITapGestureRecognizer ){
+        print ("tapped")
+        messageTextfield.endEditing(true)   
+    }
     
     //TODO: Declare configureTableView here:
     
-    
+    func configureTableView(){
+        messageTableView.rowHeight = UITableViewAutomaticDimension
+        messageTableView.estimatedRowHeight = 100
+    }
     
     ///////////////////////////////////////////
     
@@ -73,12 +84,25 @@ class ChatViewController: UIViewController {
     
 
     
-    //TODO: Declare textFieldDidBeginEditing here:
+   
     
     
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+       
+        UIView.animate(withDuration: 1.0, animations: {
+            self.heightConstraint.constant = 310
+            self.view.layoutIfNeeded()
+        })
+    }
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        print("Ended editing")
+        UIView.animate(withDuration: 1.0, animations: {
+            self.heightConstraint.constant = 50
+            self.view.layoutIfNeeded()
+        })
+    }
     
     
-    //TODO: Declare textFieldDidEndEditing here:
     
 
     
