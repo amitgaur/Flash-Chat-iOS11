@@ -8,18 +8,22 @@
 
 import UIKit
 import FirebaseAuth
+import FirebaseDatabase
 import SVProgressHUD
 
 class ChatViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
-    var messages : [String] = ["1","2asda asdasda a sdasdasd  asdaj;iasdjio asda'da'sid''sad asdasd asdasd'oasid'oasdi'asdioa'sdi 'said'aosdia'sid 'asoid as'id a'sid 'asid 'as'asid ","3"]
+    var messages : [Message] = [Message]()
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3;
+        return messages.count;
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "customMessageCell", for: indexPath) as! CustomMessageCell
-        cell.messageBody.text = messages[indexPath.row]
+        cell.messageBody.text = messages[indexPath.row].body
+        let imageView = UIImage(named: "egg", in: nil, compatibleWith: nil)
+        cell.avatarImageView.image = imageView
+        cell.senderUsername.text = messages[indexPath.row].sender
         return cell
         
     }
@@ -57,6 +61,7 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         //TODO: Register your MessageCell.xib file here:
         messageTableView.register(UINib(nibName : "MessageCell", bundle : nil), forCellReuseIdentifier: "customMessageCell")
         configureTableView()
+        retreiveMessages()
         
     }
 
@@ -75,6 +80,7 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     func configureTableView(){
         messageTableView.rowHeight = UITableViewAutomaticDimension
         messageTableView.estimatedRowHeight = 100
+        messageTableView.separatorStyle = .none
     }
     
     ///////////////////////////////////////////
@@ -116,18 +122,51 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     
     @IBAction func sendPressed(_ sender: AnyObject) {
+        messageTextfield.endEditing(true)
+        messageTextfield.isEnabled = false
+        sendButton.isEnabled = false
+        let message = messageTextfield.text!
+        let sender = Auth.auth().currentUser?.email!
         
-        
-        //TODO: Send the message to Firebase and save it in our database
-        
+        let dictionary : [String:String] = ["MessageBody"  : message, "Sender" : sender!]
+     
+        let db = Database.database().reference().child("Messages")
+        db.childByAutoId().setValue(dictionary){
+            (error,reference) in
+            if (error != nil){
+                SVProgressHUD.showError(withStatus: error.debugDescription)
+            }
+            else {
+                self.messageTextfield.isEnabled = true
+                self.sendButton.isEnabled = true
+                self.messageTextfield.text = ""
+                
+            }
+        }
+       
+        //messageTextfield.isEnabled = true
         
     }
     
     //TODO: Create the retrieveMessages method here:
     
     
-
+    func saveToDb(_ message : Message) {
+        
+    }
     
+    func retreiveMessages(){
+        Database.database().reference().child("Messages").observe(.childAdded){
+            (snapshot) in
+            print ("\(snapshot.value.debugDescription)")
+            let messageDict = snapshot.value as! Dictionary<String,String>
+            let message = Message();
+            message.sender = messageDict["Sender"]!
+            message.body = messageDict["MessageBody"]!
+            self.messages.append(message)
+            self.messageTableView.reloadData()
+        }
+    }
     
     
     @IBAction func logOutPressed(_ sender: AnyObject) {

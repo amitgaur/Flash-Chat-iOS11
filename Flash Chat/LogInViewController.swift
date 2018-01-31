@@ -26,11 +26,12 @@ class LogInViewController: UIViewController {
 
    
     @IBAction func logInPressed(_ sender: AnyObject) {
-
+        SVProgressHUD.show()
         
         if (!emailTextfield.text!.isEmpty && !passwordTextfield.text!.isEmpty){
             
             Auth.auth().signIn(withEmail: emailTextfield.text!, password: passwordTextfield.text!, completion: { (user, error) in
+                SVProgressHUD.dismiss()
                 if let error = error {
                     
                     let localErr =  "Error logging in \(error.localizedDescription)"
