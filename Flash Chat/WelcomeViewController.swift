@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import FirebaseAuth
 
 
 class WelcomeViewController: UIViewController {
@@ -14,6 +14,9 @@ class WelcomeViewController: UIViewController {
    
     override func viewDidLoad() {
         super.viewDidLoad()
+        if (Auth.auth().currentUser != nil){
+            self.performSegue(withIdentifier: "goToChat", sender: nil)
+        }
 
     
     }

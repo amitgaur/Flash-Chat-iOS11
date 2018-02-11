@@ -10,6 +10,7 @@ import UIKit
 import FirebaseAuth
 import FirebaseDatabase
 import SVProgressHUD
+import ChameleonFramework
 
 class ChatViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
     var messages : [Message] = [Message]()
@@ -24,9 +25,12 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         let imageView = UIImage(named: "egg", in: nil, compatibleWith: nil)
         cell.avatarImageView.image = imageView
         cell.senderUsername.text = messages[indexPath.row].sender
+        cell.avatarImageView.backgroundColor = UIColor.flatBlue()
+        cell.messageBody.backgroundColor = UIColor.flatMint()
         return cell
         
     }
+    
     
     
     
@@ -68,11 +72,17 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
   
     
     
-    //TODO: Declare tableViewTapped here:
+    //MARK: Gesture recognizers
     
     @IBAction func tapped(recognizer : UITapGestureRecognizer ){
         print ("tapped")
         messageTextfield.endEditing(true)   
+    }
+    
+    @IBAction func swipeToMaps(_ sender: UISwipeGestureRecognizer) {
+        
+        print ("Swiped to maps" )
+        self.performSegue(withIdentifier: "mapViewSegue", sender: self)
     }
     
     //TODO: Declare configureTableView here:

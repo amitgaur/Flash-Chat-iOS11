@@ -8,6 +8,7 @@
 
 import UIKit
 import Firebase
+import GoogleMaps
 
 
 @UIApplicationMain
@@ -33,8 +34,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 print ("Error signing out")
             }
         }
-        
+        setupMaps()
         return true
+    }
+    
+    func setupMaps(){
+        GMSServices.provideAPIKey("AIzaSyAdS0_ulFSOIzh-yKLmeHqhy46xEp8PyZk")
+        
     }
 
     
