@@ -8,11 +8,19 @@
 
 import UIKit
 import GoogleMaps
-class MapViewController: UIViewController {
+import SVProgressHUD
+class MapViewController: UIViewController, CLLocationManagerDelegate {
 
+    private let locationManager = CLLocationManager()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        print ("view controller loaded")
+        locationManager.delegate = self
+        locationManager.requestAlwaysAuthorization()
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.distanceFilter = 100
+        
+        
         // Do any additional setup after loading the view.
     }
 
@@ -26,17 +34,37 @@ class MapViewController: UIViewController {
         
     }
     
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    //MARK: Location Management Functions
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        print ("location authorization changed \(status.rawValue)")
+        guard (status ==  CLAuthorizationStatus.authorizedAlways ||  status == CLAuthorizationStatus.authorizedWhenInUse) else {
+            return
+        }
+        locationManager.startUpdatingLocation()
+        mapView.isMyLocationEnabled = true
+        mapView.settings.myLocationButton = true
+        
     }
-    */
 
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print ("unable to get authorization \(error.localizedDescription)")
+        SVProgressHUD.show(withStatus: "Unable to get location :please make sure location sharing is enabled")
+        SVProgressHUD.dismiss()
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        print ("got updated locations")
+        
+        guard (locations.count>0 &&  locations[locations.count-1].horizontalAccuracy>0) else {
+            print ("Not valid locations yets")
+            return
+        }
+        mapView.camera = GMSCameraPosition(target: locations[locations.count-1].coordinate, zoom: 15, bearing: 0, viewingAngle: 0)
+        locationManager.stopUpdatingLocation()
+    }
 }
+
 extension MapViewController : GMSMapViewDelegate{
     
 }
